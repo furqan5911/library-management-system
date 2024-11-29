@@ -18,12 +18,17 @@ def category_menu(admin, category_service):
         elif choice == "2":
             category_id = int(input("Enter category ID to update: "))
             new_name = input("Enter new category name: ")
-            category_service.update_category(admin, category_id, new_name)
-            print("Category updated successfully!")
+            if category_service.update_category(admin, category_id, new_name):
+                print("Category updated successfully!")
+            else:
+                print(f"Error: No category found with ID: {category_id}")
         elif choice == "3":
             category_id = int(input("Enter category ID to delete: "))
-            category_service.delete_category(admin, category_id)
-            print("Category deleted successfully!")
+            # Check if the deletion was successful
+            if category_service.delete_category(admin, category_id):
+                print("Category deleted successfully!")
+            else:
+                print(f"Error: No category found with ID: {category_id}")
         elif choice == "4":
             categories = category_service.list_categories()
             print("\n=== Categories ===")
@@ -34,3 +39,9 @@ def category_menu(admin, category_service):
             return
         else:
             print("Invalid choice! Please try again.")
+
+
+
+
+
+

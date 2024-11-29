@@ -19,12 +19,16 @@ def membership_menu(admin, membership_service):
         elif choice == "2":
             plan_id = int(input("Enter plan ID to update: "))
             new_price = float(input("Enter new plan price: "))
-            membership_service.update_plan(admin, plan_id, {"plan_price": new_price})
-            print("Membership plan updated successfully!")
+            if membership_service.update_plan(admin, plan_id, {"plan_price": new_price}):  # Check return value
+                print("Membership plan updated successfully!")
+            else:
+                print(f"Error: Update failed. No membership plan found with ID: {plan_id}")
         elif choice == "3":
             plan_id = int(input("Enter plan ID to delete: "))
-            membership_service.delete_plan(admin, plan_id)
-            print("Membership plan deleted successfully!")
+            if membership_service.delete_plan(admin, plan_id):  # Check return value
+                print("Membership plan deleted successfully!")
+            else:
+                print(f"Error: Deletion failed. No membership plan found with ID: {plan_id}")
         elif choice == "4":
             plans = membership_service.list_plans()
             print("\n=== Membership Plans ===")
@@ -35,3 +39,15 @@ def membership_menu(admin, membership_service):
             return
         else:
             print("Invalid choice! Please try again.")
+
+
+
+
+
+
+
+
+
+
+
+

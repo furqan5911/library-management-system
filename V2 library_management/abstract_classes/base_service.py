@@ -84,25 +84,37 @@ class BaseService:
         :param updated_data: Dictionary with updated key-value pairs.
         :return: The updated record.
         """
-        data = self.load()
-        for item in data:
-            if item["id"] == id:
-                item.update(updated_data)
-                self.storage_manager.update_data(item)
-                return item
-        raise ValueError(f"No record found with ID: {id}")
+        try:
+            data = self.load()
+            for item in data:
+                if item["id"] == id:
+                    item.update(updated_data)
+                    self.storage_manager.update_data(item)
+                    return item
+        except ValueError as e:
+            print(e)
+            return False  # Ensure the method gracefully handles the error
+       
+    
 
     def delete(self, id):
         """
         Delete a record by ID.
-        
+
         :param id: The ID of the record to delete.
         :return: True if the record was deleted, False otherwise.
         """
-        data = self.load()
-        updated_data = [item for item in data if item["id"] != id]
-        if len(updated_data) == len(data):
-            raise ValueError(f"No record found with ID: {id}")
-        with open(self.file_path, "w") as file:
-            json.dump(updated_data, file, indent=4)
-        return True
+        try:
+            data = self.load()
+            updated_data = [item for item in data if item["id"] != id]
+            if len(updated_data) == len(data):
+                raise ValueError(f"No record found with ID: {id}")
+            with open(self.file_path, "w") as file:
+                json.dump(updated_data, file, indent=4)
+            print(f"Record with ID {id} deleted successfully.")
+            return True
+        except ValueError as e:
+            print(e)
+            return False  # Ensure the method gracefully handles the error
+
+

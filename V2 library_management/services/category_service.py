@@ -1,4 +1,5 @@
 # CategoryService class
+
 from abstract_classes.base_service import BaseService
 from entities.category import Category
 
@@ -14,7 +15,11 @@ class CategoryService(BaseService):
     """
     def __init__(self, file_path):
         super().__init__(file_path)
-        self.categories = self.load()
+        try:
+            self.categories = self.load()
+        except Exception as e:
+            print(f"Error loading categories: {e}")
+            self.categories = []
 
     def add_category(self, current_user, category_data):
         """
@@ -24,9 +29,16 @@ class CategoryService(BaseService):
         :param category_data: Dictionary containing category information.
         :return: The created Category object.
         """
-        if not current_user.is_admin():
-            raise PermissionError("Only admins can add categories.")
-        return self.create(category_data)
+        try:
+            if not current_user.is_admin():
+                raise PermissionError("Only admins can add categories.")
+            return self.create(category_data)
+        except PermissionError as e:
+            print(f"Error: {e}")
+            return None
+        except Exception as e:
+            print(f"Unexpected error while adding category: {e}")
+            return None
 
     def update_category(self, current_user, category_id, updated_name):
         """
@@ -37,9 +49,19 @@ class CategoryService(BaseService):
         :param updated_name: New name for the category.
         :return: The updated Category object.
         """
-        if not current_user.is_admin():
-            raise PermissionError("Only admins can update categories.")
-        return self.update(category_id, {"name": updated_name})
+        try:
+            if not current_user.is_admin():
+                raise PermissionError("Only admins can update categories.")
+            return self.update(category_id, {"name": updated_name})
+        except PermissionError as e:
+            print(f"Error: {e}")
+            return None
+        except ValueError as e:
+            print(f"Error: {e}")
+            return None
+        except Exception as e:
+            print(f"Unexpected error while updating category: {e}")
+            return None
 
     def delete_category(self, current_user, category_id):
         """
@@ -49,9 +71,19 @@ class CategoryService(BaseService):
         :param category_id: ID of the category to delete.
         :return: True if deletion was successful.
         """
-        if not current_user.is_admin():
-            raise PermissionError("Only admins can delete categories.")
-        return self.delete(category_id)
+        try:
+            if not current_user.is_admin():
+                raise PermissionError("Only admins can delete categories.")
+            return self.delete(category_id)
+        except PermissionError as e:
+            print(f"Error: {e}")
+            return False
+        except ValueError as e:
+            print(f"Error: {e}")
+            return False
+        except Exception as e:
+            print(f"Unexpected error while deleting category: {e}")
+            return False
 
     def list_categories(self):
         """
@@ -59,4 +91,10 @@ class CategoryService(BaseService):
 
         :return: List of all categories.
         """
-        return [Category.from_dict(category) for category in self.categories]
+        try:
+            return [Category.from_dict(category) for category in self.categories]
+        except Exception as e:
+            print(f"Error while listing categories: {e}")
+            return []
+
+

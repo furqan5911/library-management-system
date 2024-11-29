@@ -30,12 +30,17 @@ def book_menu(admin, book_service):
             title = input("New title: ")
             if title:
                 updated_data["title"] = title
-            book_service.update_book(admin, book_id, updated_data)
-            print("Book updated successfully!")
+            if book_service.update_book(admin, book_id, updated_data):
+                print("Book updated successfully!")
+            else:
+                print(f"Error: No book found with ID: {book_id}")
         elif choice == "3":
             book_id = int(input("Enter book ID to delete: "))
-            book_service.delete_book(admin, book_id)
-            print("Book deleted successfully!")
+            # Check if the deletion was successful
+            if book_service.delete_book(admin, book_id):
+                print("Book deleted successfully!")
+            else:
+                print(f"Error: No book found with ID: {book_id}")
         elif choice == "4":
             books = book_service.list_books()
             print("\n=== Books ===")
@@ -46,3 +51,5 @@ def book_menu(admin, book_service):
             return
         else:
             print("Invalid choice! Please try again.")
+
+

@@ -42,11 +42,11 @@ def ensure_data_files_exist():
 def main():
     ensure_data_files_exist()
     user_service = UserService("data/users.json")
-    book_service = BookService("data/books.json")
+    book_service = BookService("data/books.json", "data/authors.json", "data/categories.json")
     author_service = AuthorService("data/authors.json")
     category_service = CategoryService("data/categories.json")
     membership_service = MembershipService("data/memberships.json", "data/user_memberships.json")
-    transaction_service = TransactionService("data/transactions.json", "data/user_memberships.json")
+    transaction_service = TransactionService("data/transactions.json", "data/user_memberships.json", book_service)
 
     while True:
         choice = initial_menu()
@@ -81,4 +81,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
 

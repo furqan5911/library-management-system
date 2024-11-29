@@ -25,17 +25,24 @@ def author_menu(admin, author_service):
             first_name = input("New first name: ")
             if first_name:
                 updated_data["first_name"] = first_name
-            author_service.update_author(admin, author_id, updated_data)
-            print("Author updated successfully!")
+            if author_service.update_author(admin, author_id, updated_data):
+                print("Author updated successfully!")
+            else:
+                print(f"Error: No author found with ID: {author_id}")
         elif choice == "3":
             author_id = int(input("Enter author ID to delete: "))
-            author_service.delete_author(admin, author_id)
-            print("Author deleted successfully!")
+            # Check if the deletion was successful
+            if author_service.delete_author(admin, author_id):
+                print("Author deleted successfully!")
+            else:
+                print(f"Error: No author found with ID: {author_id}")
         elif choice == "4":
             author_id = int(input("Enter author ID: "))
             book_id = int(input("Enter book ID to assign: "))
-            author_service.assign_book_to_author(admin, author_id, book_id)
-            print("Book assigned to author successfully!")
+            if author_service.assign_book_to_author(admin, author_id, book_id):
+                print("Book assigned to author successfully!")
+            else:
+                print("Error: Could not assign book. Check the author or book ID.")
         elif choice == "5":
             authors = author_service.list_authors()
             print("\n=== Authors ===")
@@ -46,3 +53,5 @@ def author_menu(admin, author_service):
             return
         else:
             print("Invalid choice! Please try again.")
+
+
