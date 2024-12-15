@@ -51,7 +51,7 @@ class MembershipRepository(BaseRepository):
         except Exception as e:
             print(f"Error retrieving memberships: {e}")
             return []
-
+        
     def update_membership(self, membership_id, data):
         """
         Update an existing membership plan.
@@ -61,10 +61,22 @@ class MembershipRepository(BaseRepository):
         :return: True if the update was successful, False otherwise.
         """
         try:
-            return self.update(membership_id, data)
+            set_clause = ", ".join([f"{key} = %({key})s" for key in data.keys()])
+            query = f"UPDATE {self.table_name} SET {set_clause} WHERE id = %(id)s;"
+            data["id"] = membership_id
+
+            with self.db_client.cursor() as cursor:
+                cursor.execute(query, data)
+                self.db_client.commit()
+                return cursor.rowcount > 0  # True if at least one row was updated
         except Exception as e:
             print(f"Error updating membership with ID {membership_id}: {e}")
+            self.db_client.rollback()
             return False
+
+
+
+
 
     def find_by_name(self, plan_name):
         """
@@ -81,3 +93,22 @@ class MembershipRepository(BaseRepository):
         except Exception as e:
             print(f"Error retrieving membership by plan name: {e}")
             return None
+    
+    def delete_membership(self, membership_id):
+        """
+        Deletes a membership plan by its ID.
+
+        :param membership_id: The ID of the membership to delete.
+        :return: True if the deletion was successful, False otherwise.
+        """
+        try:
+            query = f"DELETE FROM {self.table_name} WHERE id = %s;"
+            with self.db_client.cursor() as cursor:
+                cursor.execute(query, (membership_id,))
+                self.db_client.commit()
+                return cursor.rowcount > 0  # True if at least one row was deleted
+        except Exception as e:
+            print(f"Error deleting membership with ID {membership_id}: {e}")
+            self.db_client.rollback()
+            return False
+

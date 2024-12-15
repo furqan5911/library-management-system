@@ -118,3 +118,38 @@ class UserService(BaseService):
         except Exception as e:
             self.handle_error(f"deleting user ID {user_id}", e)
             return False
+
+    def sign_up_user(self, first_name, last_name, email, password):
+        """
+        Allows new users to sign up by providing their details.
+
+        :param first_name: First name of the user.
+        :param last_name: Last name of the user.
+        :param email: Email address of the user.
+        :param password: Password of the user.
+        :return: The created user's ID or an error message.
+        """
+        try:
+            # Validate required fields
+            self.validate_required_fields(
+                {"first_name": first_name, "last_name": last_name, "email": email, "password": password},
+                ["first_name", "last_name", "email", "password"]
+            )
+
+            # Ensure email is unique
+            if self.user_repository.find_by_email(email):
+                return "A user with this email already exists."
+
+            # Create the user
+            user_data = {
+                "first_name": first_name,
+                "last_name": last_name,
+                "email": email,
+                "password": password,  # Consider hashing the password for security.
+                "role": "user",
+            }
+            user_id = self.user_repository.create_user(user_data)
+            return f"User created successfully with ID: {user_id}"
+        except Exception as e:
+            self.handle_error("signing up user", e)
+            return "Failed to sign up. Please try again."

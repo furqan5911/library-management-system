@@ -29,7 +29,7 @@ class MembershipService(BaseService):
             self.validate_required_fields(data, ["plan_name", "plan_price"])
 
             # Check if the membership plan already exists
-            existing_plan = self.membership_repo.find_by_plan_name(data["plan_name"])
+            existing_plan = self.membership_repo.find_by_name(data["plan_name"])
             if existing_plan:
                 return f"Membership plan '{data['plan_name']}' already exists."
 
@@ -95,7 +95,7 @@ class MembershipService(BaseService):
         :return: True if successful, False otherwise.
         """
         try:
-            return self.membership_repo.delete(membership_id)
+            return self.membership_repo.delete_membership(membership_id)
         except Exception as e:
             self.handle_error(f"deleting membership ID {membership_id}", e)
             return False

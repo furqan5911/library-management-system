@@ -78,22 +78,46 @@ class BookRepository(BaseRepository):
             print(f"Error retrieving available books: {e}")
             return []
 
-    def search_books(self, search_criteria, value):
-        """
-        Search books by criteria (e.g., title, author_id, or category_id).
+    # def search_books(self, search_criteria, value):
+    #     """
+    #     Search books by criteria (e.g., title, author_id, or category_id).
 
-        :param search_criteria: Column to search (title, author_id, category_id).
-        :param value: Value to search for.
-        :return: A list of dictionaries representing matching books.
+    #     :param search_criteria: Column to search (title, author_id, category_id).
+    #     :param value: Value to search for.
+    #     :return: A list of dictionaries representing matching books.
+    #     """
+    #     try:
+    #         query = f"SELECT * FROM {self.table_name} WHERE {search_criteria} ILIKE %s;"
+    #         with self.db_client.cursor() as cursor:
+    #             cursor.execute(query, (f"%{value}%",))
+    #             return cursor.fetchall()
+    #     except Exception as e:
+    #         print(f"Error searching books: {e}")
+    #         return []
+
+    def search_books(self, search_criteria, value, exact_match=False):
+        """
+        Searches for books based on the given criteria.
+
+        :param search_criteria: The field to search by (e.g., title, author_id, category_id).
+        :param value: The value to search for.
+        :param exact_match: Whether to perform an exact match (e.g., for numeric fields like 'id').
+        :return: A list of books matching the criteria.
         """
         try:
-            query = f"SELECT * FROM {self.table_name} WHERE {search_criteria} ILIKE %s;"
+            if exact_match:
+                query = f"SELECT * FROM {self.table_name} WHERE {search_criteria} = %s;"
+            else:
+                query = f"SELECT * FROM {self.table_name} WHERE {search_criteria} ILIKE %s;"
+                value = f"%{value}%"  # Add wildcards for pattern matching
+
             with self.db_client.cursor() as cursor:
-                cursor.execute(query, (f"%{value}%",))
+                cursor.execute(query, (value,))
                 return cursor.fetchall()
         except Exception as e:
-            print(f"Error searching books: {e}")
+            print(f"Error searching books by {search_criteria}: {e}")
             return []
+
 
     def list_by_category(self, category_id):
         """

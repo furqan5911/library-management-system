@@ -4,11 +4,12 @@
 from services.book_service import BookService
 from services.transaction_service import TransactionService
 from services.user_membership_service import UserMembershipService
+from services.membership_service import MembershipService
 from utils.helpers import print_separator
 
 
 def user_dashboard(user, book_service: BookService, transaction_service: TransactionService,
-                   user_membership_service: UserMembershipService):
+                   user_membership_service: UserMembershipService, membership_service: MembershipService):
     """
     User dashboard for accessing library features.
     """
@@ -18,8 +19,10 @@ def user_dashboard(user, book_service: BookService, transaction_service: Transac
         print("1. View Books")
         print("2. Search Books")
         print("3. Purchase a Book")
-        print("4. View Membership Details")
-        print("5. View Transaction History")
+        print("4. View My Membership Details")  # Existing option
+        print("5. View Available Membership Plans")  # New option
+        print("6. Purchase Membership Plan")  # New option
+        print("7. View Transaction History")
         print("0. Logout")
         print_separator()
         choice = input("Enter your choice: ")
@@ -33,12 +36,17 @@ def user_dashboard(user, book_service: BookService, transaction_service: Transac
         elif choice == "4":
             view_membership_details(user, user_membership_service)
         elif choice == "5":
+            view_membership_plans(membership_service)  # New function
+        elif choice == "6":
+            purchase_membership_plan(user, membership_service, user_membership_service)  # Updated function
+        elif choice == "7":
             view_transaction_history(user, transaction_service)
         elif choice == "0":
             print("Logging out from User Dashboard...")
             break
         else:
             print("Invalid choice! Please try again.")
+
 
 
 def view_books(book_service: BookService):
@@ -150,3 +158,53 @@ def view_transaction_history(user, transaction_service: TransactionService):
             print(f"Transaction ID: {tx['id']}, Book ID: {tx['book_id']}, Price: ${tx['price']}, Date: {tx['transaction_date']}")
     else:
         print("You have no transaction history.")
+
+
+def view_membership_plans(membership_service: MembershipService):
+    """
+    Displays all available membership plans for users to view.
+    """
+    print("\n=== Available Membership Plans ===")
+    memberships = membership_service.list_memberships()  # Fetch membership plans
+    if memberships:
+        for membership in memberships:
+            print(f"ID: {membership['id']}, Name: {membership['plan_name']}, Price: ${membership['plan_price']}")
+    else:
+        print("No membership plans are currently available.")
+
+
+def purchase_membership_plan(user, membership_service: MembershipService, user_membership_service: UserMembershipService):
+    """
+    Allows the user to purchase a membership plan.
+    """
+    print("\n=== Purchase Membership Plan ===")
+    memberships = membership_service.list_memberships()  # Fetch available memberships
+    if memberships:
+        print("Available Membership Plans:")
+        for membership in memberships:
+            print(f"ID: {membership['id']}, Name: {membership['plan_name']}, Price: ${membership['plan_price']}")
+    else:
+        print("No membership plans available.")
+        return
+
+    # Prompt the user to select a membership plan
+    membership_id = input("Enter the Membership ID to purchase: ").strip()
+    try:
+        membership_id = int(membership_id)
+    except ValueError:
+        print("Invalid Membership ID.")
+        return
+
+    # Check if the membership exists
+    selected_membership = next((m for m in memberships if m["id"] == membership_id), None)
+    if not selected_membership:
+        print("Membership plan not found.")
+        return
+
+    # Purchase the membership
+    balance = selected_membership["plan_price"]
+    result = user_membership_service.create_user_membership(user["id"], membership_id, balance)
+    if isinstance(result, dict):  # Success
+        print(f"Membership plan '{selected_membership['plan_name']}' purchased successfully!")
+    else:
+        print("Failed to purchase membership plan. Please try again.")
