@@ -24,55 +24,7 @@ class TransactionService(BaseService):
         self.book_repo = BookRepository(db_client)
         self.user_membership_repo = UserMembershipRepository(db_client)
 
-    # def record_transaction(self, user_id, book_id, price):
-    #     """
-    #     Records a book purchase transaction.
 
-    #     :param user_id: The ID of the user.
-    #     :param book_id: The ID of the book being purchased.
-    #     :param price: The price of the book.
-    #     :return: The created transaction record or an error message.
-    #     """
-    #     try:
-    #         # Check if the user has an active membership
-    #         user_membership = self.user_membership_repo.get_membership_by_user_id(user_id)
-    #         if not user_membership:
-    #             return "User does not have an active membership."
-
-    #         # Ensure the user has sufficient balance
-    #         if user_membership["remaining_balance"] < price:
-    #             return "Insufficient balance to purchase the book."
-
-    #         # Check if the book is available
-    #         book = self.book_repo.find_by_id(book_id)
-    #         if not book or book["is_sold"]:
-    #             return "Book is either not available or already sold."
-
-    #         # Deduct the balance and update the user's membership
-    #         new_balance = user_membership["remaining_balance"] - price
-    #         self.user_membership_repo.update_balance(user_id, new_balance)
-
-    #         # Mark the book as sold
-    #         self.book_repo.mark_as_sold(book_id)
-
-    #         # Record the transaction
-    #         transaction_data = {
-    #             "user_id": user_id,
-    #             "book_id": book_id,
-    #             "price": price,
-    #             "transaction_date": datetime.now(),
-    #         }
-    #         transaction_id = self.transaction_repo.record_transaction(transaction_data)
-    #         return Transaction(
-    #             id=transaction_id,
-    #             user_id=user_id,
-    #             book_id=book_id,
-    #             price=price,
-    #             transaction_date=transaction_data["transaction_date"],
-    #         ).to_dict()
-    #     except Exception as e:
-    #         self.handle_error("recording transaction", e)
-    #         return None
    
     def record_transaction(self, user_id, book_id, price):
         """

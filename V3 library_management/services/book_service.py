@@ -96,20 +96,7 @@ class BookService:
             print(f"Error listing books: {e}")
             return []
 
-    # def search_books(self, search_criteria, value):
-    #     """
-    #     Searches books based on the specified criteria.
 
-    #     :param search_criteria: The field to search by (e.g., title, author_id, category_id).
-    #     :param value: The value to search for.
-    #     :return: A list of matching books.
-    #     """
-    #     try:
-    #         books = self.book_repo.search_books(search_criteria, value)
-    #         return [Book.from_dict(book).to_dict() for book in books]
-    #     except Exception as e:
-    #         print(f"Error searching books: {e}")
-    #         return []
 
     def search_books(self, search_criteria, value):
         """
